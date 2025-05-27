@@ -1,0 +1,2259 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    cursor: url('./assets/images/cursor.png'), auto;
+}
+
+/* 使用系统字体替代缺失的Minecraft字体 */
+@font-face {
+    font-family: 'Minecraft';
+    src: local('Courier New'), local('monospace');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+    cursor: url('./assets/images/cursor.png'), auto;
+}
+
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#game-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 24px;
+    pointer-events: none;
+}
+
+#info {
+    display: none;
+}
+
+#hotbar {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    width: auto;
+    height: 45px;
+    z-index: 20;
+    filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.5));
+}
+
+.hotbar-slot {
+    width: 40px;
+    height: 40px;
+    margin: 0 2px;
+    background-image: url('./assets/images/hotbar.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out, border 0.1s ease-in-out;
+}
+
+.hotbar-slot.selected {
+    border: 3px solid white;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.7), inset 0 0 5px rgba(255, 255, 255, 0.5);
+    transform: scale(1.08);
+    z-index: 25;
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.slot-item {
+    width: 32px;
+    height: 32px;
+    background-size: cover;
+    image-rendering: pixelated;
+    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+}
+
+.slot-count {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    color: white;
+    font-size: 12px;
+    pointer-events: none;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+#held-item-display {
+    display: none !important;
+}
+
+/* Menu Styles */
+#menu-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('./assets/images/dirtBG.png'); 
+    background-repeat: repeat;
+    background-size: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    image-rendering: pixelated;
+}
+
+.menu-screen {
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    padding: 0;
+    font-family: 'Minecraft', Arial, sans-serif;
+}
+
+.menu-screen.active {
+    display: flex;
+}
+
+#main-menu {
+    display: flex;
+}
+
+.minecraft-logo {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 80px;
+    width: 100%;
+}
+
+.minecraft-logo img {
+    width: 500px;
+    height: auto;
+    image-rendering: pixelated;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px; 
+    align-items: center;
+}
+
+.menu-button {
+    background-color: #5b5b5b;
+    color: #FFFFFF;
+    border: 2px solid #000000;
+    border-radius: 0;
+    padding: 15px 20px; 
+    margin: 5px 0;
+    font-size: 1.2em; 
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    font-family: 'Minecraft', Arial, sans-serif;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.4), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.4),
+                2px 2px 5px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s;
+    letter-spacing: 0.5px; 
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+}
+
+.menu-button:hover {
+    background-color: #727272;
+    box-shadow: inset 2px 2px 5px rgba(255, 255, 255, 0.5), 
+                inset -2px -2px 5px rgba(0, 0, 0, 0.5),
+                3px 3px 7px rgba(0, 0, 0, 0.4);
+}
+
+.white-text {
+    color: #FFFFFF !important;
+}
+
+.menu-button.disabled {
+    background-color: #404040;
+    color: #888888;
+    cursor: not-allowed;
+}
+
+.minecraft-footer {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    color: #FFFFFF;
+    font-size: 0.8em;
+    padding: 0 20px;
+    font-family: 'Minecraft', Arial, sans-serif;
+}
+
+.minecraft-version {
+    color: #FFFF55; 
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.minecraft-copyright {
+    color: #FFFFFF;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+/* World Creation Form Styling - Updated */
+.world-creation-form {
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 20px;
+    font-family: 'Minecraft', Arial, sans-serif;
+}
+
+.form-group {
+    background-color: rgba(128, 128, 128, 0.5);
+    border: 2px solid #555;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-radius: 0;
+}
+
+.form-group label {
+    display: block;
+    color: #fff;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #333;
+    border: 2px solid #555;
+    color: #fff;
+    font-size: 1em;
+    border-radius: 0;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.form-group input[type="text"]:focus {
+    outline: none;
+    border-color: #777;
+    background-color: #444;
+}
+
+.form-group input[type="text"]::placeholder {
+    color: #888;
+}
+
+/* Game Mode and World Type Toggle Styles */
+.game-mode-options,
+.world-type-options {
+    display: flex;
+    flex-direction: column;
+}
+
+.toggle-label {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: white;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+#create-world-screen {
+    background-image: url('./assets/images/dirtBG.png');
+    background-repeat: repeat;
+    background-size: auto;
+    position: relative;
+}
+
+#create-world-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+}
+
+#create-world-screen h2 {
+    color: white;
+    margin-bottom: 20px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+/* Flying indicator */
+.flying-indicator {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    background-color: rgba(0, 90, 255, 0.7); 
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.flying-indicator.visible {
+    opacity: 1;
+}
+
+/* Pause Menu */
+.pause-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.pause-container {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 30px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    background: linear-gradient(145deg, rgba(50, 50, 50, 0.9), rgba(30, 30, 30, 0.9));
+    font-family: 'Minecraft', Arial, sans-serif;
+}
+
+/* Settings Categories */
+.settings-category {
+    background-color: rgba(50, 50, 50, 0.9);
+    border-radius: 0;
+    margin-bottom: 10px;
+    padding: 15px;
+    width: 100%;
+    border: 2px solid #414141;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.2), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3);
+}
+
+.category-title {
+    color: #ffdd00; 
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #555;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+.settings-option {
+    background-color: #5b5b5b;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 0;
+    text-align: left;
+    border: 2px solid #000000;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3),
+                2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.settings-slider {
+    width: 100%;
+    height: 20px;
+    background: #333;
+    outline: none;
+    opacity: 1;
+    transition: opacity .2s;
+    border-radius: 0;
+    border: 1px solid #000;
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.settings-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 20px;
+    background: #5dd34a;
+    border-radius: 0;
+    cursor: pointer;
+    border: 1px solid #000;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.settings-slider::-moz-range-thumb {
+    width: 16px;
+    height: 20px;
+    background: #5dd34a;
+    border-radius: 0;
+    cursor: pointer;
+    border: 1px solid #000;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.settings-hint {
+    color: #FFFFFF; 
+    font-size: 0.8em;
+    margin-top: 5px;
+    font-style: italic;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+.options-container {
+    width: 100%;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    background-color: rgba(40, 40, 40, 0.9);
+    border: 2px solid #555;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+}
+
+.settings-section-title {
+    color: #ffcc00;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 15px 0 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #555;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+/* Toggle Label Styles - updated for regular checkboxes */
+.toggle-label {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: white;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+.keybind-container {
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 10px 0;
+    padding-right: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #555 #333;
+}
+
+.keybind-container::-webkit-scrollbar {
+    width: 12px;
+}
+
+.keybind-container::-webkit-scrollbar-track {
+    background: #333;
+}
+
+.keybind-container::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 0;
+    border: 2px solid #333;
+}
+
+.keybind-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 5px;
+    background-color: #5b5b5b;
+    border: 2px solid #000000;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3);
+}
+
+.keybind-label {
+    color: #fff;
+    flex: 1;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.keybind-button {
+    background-color: #5b5b5b;
+    color: white;
+    border: 2px solid #000000;
+    padding: 5px 8px;
+    min-width: 80px;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'Minecraft', monospace;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3),
+                2px 2px 5px rgba(0, 0, 0, 0.3);
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.keybind-button:hover {
+    background-color: #727272;
+}
+.keybind-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.keybind-prompt {
+    background-color: #333;
+    padding: 20px;
+    border-radius: 4px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.keybind-prompt p {
+    color: white;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+#cancel-keybind-btn {
+    background-color: #555;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+#cancel-keybind-btn:hover {
+    background-color: #777;
+}
+#options-btn {
+    margin-top: 10px;
+}
+
+#hearts-container {
+    position: absolute;
+    display: flex;
+    gap: 2px;
+    z-index: 30;
+}
+
+.heart-icon {
+    width: 18px;
+    height: 18px;
+    image-rendering: pixelated;
+    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.7));
+}
+
+@keyframes damage-flash {
+    0% { background-color: rgba(255, 0, 0, 0); }
+    50% { background-color: rgba(255, 0, 0, 0.3); }
+    100% { background-color: rgba(255, 0, 0, 0); }
+}
+
+.damage-flash {
+    animation: damage-flash 0.15s ease-out;
+    pointer-events: none;
+}
+.break-progress {
+    position: absolute;
+    height: auto;
+    min-height: 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+    opacity: 0.9;
+    transform: translate(-50%, -10px);
+    display: none;
+    border-radius: 4px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    z-index: 20;
+    text-align: center;
+    padding: 3px 8px;
+    min-width: 80px;
+}
+
+.break-time {
+    color: white;
+    font-size: 14px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.furnace-container {
+    position: relative;
+    width: 386px; 
+    max-width: 90%;
+    background-color: rgba(40, 40, 40, 0.9);
+    border: 2px solid #555;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    background: linear-gradient(145deg, rgba(50, 50, 50, 0.9), rgba(30, 30, 30, 0.9));
+    font-family: 'Minecraft', Arial, sans-serif;
+}
+
+.furnace-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.furnace-input, .furnace-fuel, .furnace-output {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.furnace-label {
+    color: #aaa;
+    font-size: 0.8em;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.furnace-fire {
+    font-size: 1.5em;
+    margin: 0 5px;
+    transition: opacity 0.3s;
+}
+
+.furnace-timer {
+    color: #ffcc33; 
+    font-size: 0.8em;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 5px;
+    min-height: 30px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+    user-select: none;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+    line-height: 1.2;
+}
+
+.furnace-fire.active {
+    color: #ffaa33; 
+    animation: burn 1s infinite;
+    text-shadow: 0 0 10px #ffaa33, 0 0 20px #ff7700;
+    filter: drop-shadow(0 0 5px #ffaa33);
+}
+
+@keyframes burn {
+    0% { opacity: 0.7; color: #ff7700; }
+    50% { opacity: 1; color: #ffcc00; }
+    100% { opacity: 0.7; color: #ff7700; }
+}
+
+@keyframes fuel-needed {
+    0% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+    100% { opacity: 0.3; transform: scale(1); }
+}
+
+.inventory-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100; 
+    font-family: 'Minecraft', Arial, sans-serif;
+}
+
+.inventory-container {
+    background-color: rgba(40, 40, 40, 0.9);
+    border: 2px solid #777; 
+    padding: 20px;
+    width: 386px; 
+    max-width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    background: linear-gradient(145deg, rgba(50, 50, 50, 0.9), rgba(30, 30, 30, 0.9));
+}
+
+.inventory-title {
+    color: #ffffff;
+    font-size: 1.2em;
+    text-align: center;
+    margin-bottom: 10px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+.crafting-section {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.crafting-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 40px);
+    grid-template-rows: repeat(2, 40px);
+    gap: 2px;
+    margin-right: 10px;
+}
+
+.crafting-arrow {
+    color: #bbbbbb; 
+    font-size: 1.5em;
+    margin: 0 10px;
+    min-width: 30px;
+    text-align: center;
+    transition: background 0.3s;
+    text-shadow: 0 0 5px #bbbbbb;
+}
+
+.crafting-slot, .crafting-result {
+    width: 40px;
+    height: 40px;
+    background-image: url('./assets/images/hotbar.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3);
+}
+
+.crafting-result {
+    background-color: rgba(80, 80, 80, 0.5);
+}
+.main-inventory {
+    display: grid;
+    grid-template-columns: repeat(9, 40px);
+    grid-template-rows: repeat(3, 40px);
+    gap: 2px;
+    margin-bottom: 10px;
+    width: 100%;
+    justify-content: center; 
+}
+
+.inventory-slot {
+    width: 40px;
+    height: 40px;
+    background-image: url('./assets/images/hotbar.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3);
+}
+
+.inventory-slot.selected {
+    border: 3px solid white;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.inventory-hotbar {
+    display: grid;
+    grid-template-columns: repeat(9, 40px);
+    gap: 2px;
+    margin-top: 8px;
+    border-top: 2px solid #555;
+    padding-top: 8px;
+    width: 100%; 
+    justify-content: center; 
+}
+.item-stack {
+    width: 32px;
+    height: 32px;
+    background-size: cover;
+    image-rendering: pixelated;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+}
+
+.item-count {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    color: white;
+    font-size: 12px;
+    pointer-events: none;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+.dragged-item {
+    width: 32px;
+    height: 32px;
+    background-size: cover;
+    image-rendering: pixelated;
+    position: absolute;
+    pointer-events: none;
+    z-index: 200;
+    display: none;
+}
+
+.dragged-item .item-count {
+    bottom: -4px;
+    right: -4px;
+    font-size: 14px;
+}
+.crafting-table-container {
+    position: relative;
+    width: 386px; 
+    max-width: 90%;
+    background-color: rgba(40, 40, 40, 0.9);
+    border: 2px solid #555;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    background: linear-gradient(145deg, rgba(50, 50, 50, 0.9), rgba(30, 30, 30, 0.9));
+    font-family: 'Minecraft', Arial, sans-serif;
+}
+
+.crafting-operation-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 15px;
+}
+
+.crafting-table-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 40px);
+    grid-template-rows: repeat(3, 40px);
+    gap: 2px;
+    margin-right: 10px;
+}
+
+.crafting-arrow {
+    color: #bbbbbb; 
+    font-size: 1.5em;
+    margin: 0 10px;
+    min-width: 30px;
+    text-align: center;
+    transition: background 0.3s;
+    text-shadow: 0 0 5px #bbbbbb;
+}
+.quick-craft-sidebar {
+    position: absolute;
+    top: 0;
+    right: -190px; 
+    width: 180px;
+    height: 100%;
+    background-color: rgba(40, 40, 40, 0.9);
+    border-left: 2px solid #555;
+    padding: 10px;
+    overflow-y: auto;
+    font-family: 'Minecraft', Arial, sans-serif;
+}
+
+.quick-craft-title {
+    color: white;
+    font-size: 1.2em;
+    text-align: center;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #555;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.quick-craft-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: calc(100% - 35px);
+    overflow-y: auto;
+}
+
+.quick-craft-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background-color: rgba(60, 60, 60, 0.7);
+    border: 1px solid #555;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-family: 'Minecraft', Arial, sans-serif;
+}
+
+.quick-craft-item:hover {
+    background-color: rgba(80, 80, 80, 0.7);
+}
+
+.quick-craft-icon {
+    width: 32px;
+    height: 32px;
+    background-size: cover;
+    image-rendering: pixelated;
+    margin-right: 8px;
+}
+
+.quick-craft-info {
+    flex: 1;
+}
+
+.quick-craft-name {
+    color: white;
+    font-size: 0.9em;
+    font-weight: bold;
+    margin-bottom: 3px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.quick-craft-ingredients {
+    color: #aaa;
+    font-size: 0.8em;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.no-recipes {
+    color: #aaa;
+    text-align: center;
+    padding: 10px;
+    font-style: italic;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+@keyframes hover-animation {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(180deg); }
+    100% { transform: translateY(0) rotate(360deg); }
+}
+.worlds-list {
+    width: 100%;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 2px solid #555;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.world-item {
+    background-color: #555555;
+    border: 2px solid #000000;
+    margin-bottom: 10px;
+    padding: 15px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3),
+                2px 2px 5px rgba(0, 0, 0, 0.3);
+    font-family: 'Minecraft', Arial, sans-serif;
+}
+
+.world-name {
+    color: #FFFFFF;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-shadow: 1px 1px 0px #000000;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.world-info {
+    color: #AAAAAA;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    text-shadow: 1px 1px 0px #000000;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.world-button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+    gap: 5px;
+}
+
+.world-icon {
+    width: 48px;
+    height: 48px;
+    margin-right: 15px;
+    background-color: #777;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.3), 
+                inset -1px -1px 3px rgba(0, 0, 0, 0.3);
+    border: 2px solid #000;
+}
+
+.world-icon img {
+    width: 32px;
+    height: 32px;
+    image-rendering: pixelated;
+}
+
+.world-content {
+    display: flex;
+    align-items: center;
+}
+
+.world-details {
+    flex: 1;
+}
+
+.play-btn {
+    background-color: #5B8731; 
+    color: #FFFFFF;
+    border: 2px solid #000000;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3),
+                2px 2px 5px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 0px #000000;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.play-btn:hover {
+    background-color: #6EA43B;
+    box-shadow: inset 2px 2px 5px rgba(255, 255, 255, 0.4), 
+                inset -2px -2px 5px rgba(0, 0, 0, 0.4),
+                3px 3px 7px rgba(0, 0, 0, 0.4);
+}
+
+.delete-btn {
+    background-color: #AA3333; 
+    color: #FFFFFF;
+    border: 2px solid #000000;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3),
+                2px 2px 5px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 0px #000000;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.delete-btn:hover {
+    background-color: #CC4444;
+    box-shadow: inset 2px 2px 5px rgba(255, 255, 255, 0.4), 
+                inset -2px -2px 5px rgba(0, 0, 0, 0.4),
+                3px 3px 7px rgba(0, 0, 0, 0.4);
+}
+
+.delete-all-btn {
+    background-color: #AA3333;
+    color: #FFFFFF;
+    margin-bottom: 10px;
+}
+
+.delete-all-btn:hover {
+    background-color: #CC4444;
+}
+
+.no-worlds {
+    color: #AAAAAA;
+    text-align: center;
+    padding: 15px;
+    font-style: italic;
+    text-shadow: 1px 1px 0px #000000;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.world-biome {
+    color: #CCCCCC;
+    font-size: 0.8em;
+    margin-top: 3px;
+    text-shadow: 1px 1px 0px #000000;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.world-last-played {
+    color: #AAAAAA;
+    font-size: 0.8em;
+    font-style: italic;
+    margin-top: 5px;
+    text-shadow: 1px 1px 0px #000000;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.button-java-old, .button-java {
+    margin: 5px 0;
+    width: 100%;
+    height: auto;
+    font-weight: bold;
+    box-sizing: border-box;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+input[type="range"] {
+    width: 100%;
+    height: 20px;
+    opacity: 1;
+}
+.minecraft-options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    max-width: 400px;
+    width: 100%;
+}
+
+.minecraft-option-button {
+    background-color: #727272;
+    color: #ffffff;
+    font-size: 16px;
+    padding: 12px 10px;
+    text-align: center;
+    cursor: pointer;
+    height: 50px;
+    width: 100%;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    border: 2px solid #000000;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3),
+                2px 2px 5px rgba(0, 0, 0, 0.3);
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.minecraft-option-button:hover {
+    background-color: #8a8a8a;
+}
+
+.options-done-container {
+    margin-top: 20px;
+    max-width: 400px;
+    width: 100%;
+}
+
+.settings-container {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 20px;
+    background-color: rgba(40, 40, 40, 0.7);
+    border: 2px solid #555;
+    padding: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+}
+.fov-status {
+    font-size: 14px;
+    color: #aaaaaa;
+    margin-top: 5px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+
+#fov-submenu, #sound-submenu, #video-submenu, #controls-submenu {
+    display: none;
+}
+.minecraft-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.minecraft-dialog-content {
+    background-color: rgba(40, 40, 40, 0.9);
+    border: 2px solid #555;
+    padding: 30px;
+    width: 500px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    background: linear-gradient(145deg, rgba(50, 50, 50, 0.9), rgba(30, 30, 30, 0.9));
+}
+
+.minecraft-dialog-content h2 {
+    color: white;
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.dialog-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dialog-buttons .menu-button {
+    width: 100%;
+}
+.block-texture-content {
+    width: 700px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.block-texture-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.block-name-input {
+    margin-bottom: 15px;
+}
+
+.block-name-input label {
+    display: block;
+    margin-bottom: 5px;
+    color: white;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.block-name-input input {
+    width: 100%;
+    padding: 8px;
+    background-color: #333;
+    border: 2px solid #555;
+    color: white;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.texture-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.texture-upload-item {
+    background-color: rgba(60, 60, 60, 0.7);
+    padding: 10px;
+    border: 1px solid #555;
+}
+
+.texture-upload-item label {
+    display: block;
+    margin-bottom: 5px;
+    color: white;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.texture-preview {
+    width: 100px;
+    height: 100px;
+    background-color: #444;
+    border: 1px solid #666;
+    margin: 5px auto;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    image-rendering: pixelated;
+}
+
+.texture-file {
+    display: block;
+    margin-bottom: 5px;
+    width: 100%;
+    background-color: #333;
+    color: white;
+    padding: 5px;
+    border: 1px solid #555;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.upload-texture-btn {
+    background-color: #4b6a29;
+    color: white;
+    border: 1px solid #000;
+    padding: 5px 10px;
+    cursor: pointer;
+    width: 100%;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.upload-texture-btn:hover {
+    background-color: #5b8731;
+}
+
+.texture-submit-buttons {
+    margin-top: 15px;
+}
+
+.single-texture-upload {
+    text-align: center;
+    background-color: rgba(60, 60, 60, 0.7);
+    padding: 15px;
+    border: 1px solid #555;
+}
+
+.single-texture-upload label {
+    display: block;
+    margin-bottom: 5px;
+    color: white;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.available-mods-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: rgba(40, 40, 40, 0.7);
+    border: 1px solid #555;
+}
+
+.mod-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background-color: rgba(60, 60, 60, 0.7);
+    border: 1px solid #555;
+}
+
+.mod-item-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 15px;
+    image-rendering: pixelated;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.mod-item-details {
+    flex: 1;
+}
+
+.mod-item-name {
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.mod-item-info {
+    color: #aaa;
+    font-size: 0.8em;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.no-mods-message {
+    color: #aaa;
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+.crafting-recipe-content {
+    width: 800px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.crafting-recipe-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.crafting-instructions {
+    color: white;
+    margin-bottom: 10px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.crafting-recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 60px);
+    grid-template-rows: repeat(3, 60px);
+    gap: 4px;
+    margin: 0 auto 20px auto;
+    background-color: rgba(80, 80, 80, 0.5);
+    padding: 10px;
+    border: 2px solid #555;
+}
+
+.crafting-recipe-slot {
+    width: 60px;
+    height: 60px;
+    background-image: url('./assets/images/hotbar.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3);
+}
+
+.crafting-recipe-slot:hover {
+    background-color: rgba(100, 100, 100, 0.5);
+}
+
+.crafting-recipe-slot .block-item {
+    width: 48px;
+    height: 48px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    image-rendering: pixelated;
+}
+
+.crafting-recipe-slot.selected {
+    border: 2px solid #ffcc00;
+}
+
+.crafting-block-selector {
+    background-color: rgba(60, 60, 60, 0.7);
+    padding: 15px;
+    border: 2px solid #555;
+}
+
+.crafting-block-selector h3 {
+    color: white;
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.block-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.block-selector-item {
+    width: 48px;
+    height: 48px;
+    background-color: rgba(80, 80, 80, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid #555;
+    box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.2), 
+                inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.block-selector-item:hover {
+    background-color: rgba(100, 100, 100, 0.7);
+}
+
+.block-selector-item .block-icon {
+    width: 40px;
+    height: 40px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    image-rendering: pixelated;
+}
+
+.recipe-submit-buttons {
+    margin-top: 20px;
+}
+
+.no-mods-message {
+    color: #aaa;
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+/* Mod Import Dialog Styles */
+.mod-import-content {
+    width: 800px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.mod-tabs {
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #555;
+}
+
+.mod-tab {
+    padding: 8px 15px;
+    background-color: #5b5b5b;
+    color: #ccc;
+    border: 1px solid #333;
+    border-bottom: none;
+    cursor: pointer;
+    font-family: 'Minecraft', Arial, sans-serif;
+    font-size: 0.9em;
+    margin-right: 5px;
+    outline: none;
+}
+
+.mod-tab.active {
+    background-color: #727272;
+    color: white;
+    border-bottom: 2px solid #ffdd00;
+    margin-bottom: -2px;
+}
+
+.mod-tab:hover {
+    background-color: #6a6a6a;
+}
+
+.mods-section {
+    background-color: rgba(40, 40, 40, 0.7);
+    border: 1px solid #555;
+    padding: 15px;
+    margin-bottom: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.mod-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background-color: rgba(60, 60, 60, 0.7);
+    border: 1px solid #555;
+    position: relative;
+}
+
+.mod-item-checkbox {
+    margin-right: 10px;
+}
+
+.mod-item-actions {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 5px;
+}
+
+.mod-status {
+    background-color: #555;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    margin-left: 10px;
+}
+
+.mod-status.enabled {
+    background-color: #5B8731;
+}
+
+.mod-status.disabled {
+    background-color: #AA3333;
+}
+
+.mod-status.shared {
+    background-color: #3355AA;
+}
+
+.mod-author {
+    font-size: 0.8em;
+    color: #aaa;
+    font-style: italic;
+    margin-top: 3px;
+}
+
+.mod-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.small-button {
+    padding: 8px 15px;
+    font-size: 0.9em;
+    width: auto;
+}
+
+.loading-mods-message {
+    color: #aaa;
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    font-family: 'Minecraft', Arial, sans-serif;
+}
+
+.block-options {
+    background-color: rgba(60, 60, 60, 0.7);
+    padding: 10px;
+    border: 1px solid #555;
+    margin-bottom: 15px;
+}
+
+.block-options .toggle-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.block-options .toggle-label span {
+    color: white;
+    font-weight: bold;
+}
+
+.block-options .settings-hint {
+    color: #aaa;
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+.loading-texture {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 12px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.chest-container {
+    position: relative;
+    width: 386px; 
+    max-width: 90%;
+    background-color: rgba(40, 40, 40, 0.9);
+    border: 2px solid #555;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    background: linear-gradient(145deg, rgba(50, 50, 50, 0.9), rgba(30, 30, 30, 0.9));
+    font-family: 'Minecraft', Arial, sans-serif;
+}
+
+.chest-inventory {
+    display: grid;
+    grid-template-columns: repeat(9, 40px);
+    grid-template-rows: repeat(3, 40px);
+    gap: 2px;
+    margin-bottom: 10px;
+    width: 100%;
+    justify-content: center;
+}
+
+.inventory-divider {
+    width: 100%;
+    height: 2px;
+    background-color: #555;
+    margin: 10px 0;
+}
+
+.chest-slot {
+    width: 40px;
+    height: 40px;
+    background-image: url('./assets/images/hotbar.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Stars in night sky */
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background-color: white;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 1s;
+    pointer-events: none;
+}
+
+/* Time of day indicator */
+.time-indicator {
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+    z-index: 100;
+}
+
+/* Superflat world settings */
+.superflat-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.superflat-controls .small-button {
+    padding: 5px 10px;
+    font-size: 0.85em;
+    width: auto;
+    white-space: nowrap;
+    margin-left: 10px;
+}
+
+.superflat-layers-container {
+    background-color: rgba(50, 50, 50, 0.7);
+    padding: 15px;
+    border: 2px solid #555;
+    margin-bottom: 15px;
+    max-height: 350px;
+    overflow-y: auto;
+    border-radius: 3px;
+}
+
+.superflat-layer-list {
+    margin-bottom: 15px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.superflat-layer-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: rgba(70, 70, 70, 0.8);
+    border: 1px solid #666;
+    margin-bottom: 8px;
+    border-radius: 2px;
+    box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.1),
+                inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s;
+}
+
+.superflat-layer-item:hover {
+    background-color: rgba(80, 80, 80, 0.8);
+}
+
+.layer-details {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 10px;
+}
+
+.layer-block-preview {
+    width: 32px;
+    height: 32px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    image-rendering: pixelated;
+    margin-right: 5px;
+    border: 1px solid #444;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.layer-block-name {
+    font-family: 'Minecraft', Arial, sans-serif;
+    color: white;
+    margin-right: 10px;
+    min-width: 100px;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.layer-thickness {
+    width: 60px;
+    padding: 6px;
+    background-color: #333;
+    color: white;
+    border: 1px solid #666;
+    margin-right: 10px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+    border-radius: 2px;
+}
+
+.layer-block-selector {
+    padding: 6px;
+    background-color: #444;
+    color: white;
+    border: 1px solid #666;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+    border-radius: 2px;
+}
+
+.remove-layer-btn {
+    background-color: #AA3333;
+    color: white;
+    border: 1px solid #000;
+    padding: 4px 8px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    cursor: pointer;
+    border-radius: 2px;
+    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2),
+                inset -1px -1px 1px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s;
+}
+
+.remove-layer-btn:hover {
+    background-color: #CC4444;
+}
+
+.superflat-layer-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.superflat-layer-controls button {
+    flex: 1;
+    padding: 8px 12px;
+}
+
+/* Day counter display */
+.day-counter {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-family: 'Minecraft', Arial, sans-serif;
+    font-size: 16px;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+    z-index: 100;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.edit-btn {
+    background-color: #5588AA; 
+    color: #FFFFFF;
+    border: 2px solid #000000;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.3),
+                2px 2px 5px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 0px #000000;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+    margin-left: 5px;
+}
+
+.edit-btn:hover {
+    background-color: #6699BB;
+    box-shadow: inset 2px 2px 5px rgba(255, 255, 255, 0.4), 
+                inset -2px -2px 5px rgba(0, 0, 0, 0.4),
+                3px 3px 7px rgba(0, 0, 0, 0.4);
+}
+
+.information-text {
+    color: #ffffff;
+    font-size: 1em;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    text-align: center;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.information-text ul {
+    text-align: left;
+    margin: 10px 0 15px 20px;
+    color: #ffffff;
+    font-size: 0.9em;
+    line-height: 1.4;
+    font-family: 'Minecraft', Arial, sans-serif;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    font-smooth: never;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+}
+
+.information-text li {
+    margin-bottom: 4px;
+}
+
+#superflat-advanced-dialog .minecraft-dialog-content {
+    width: 700px;
+    max-width: 95vw;
+    max-height: 85vh;
+}
+
+.slab-item {
+    background-size: 100% 50% !important;
+    background-position: center bottom !important;
+    background-repeat: no-repeat !important;
+}
+
+.slot-item.slab-item {
+    height: 16px !important;
+    margin-top: 16px;
+}
