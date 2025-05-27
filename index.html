@@ -1,0 +1,709 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voxel Sandbox</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.ico">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/minecraft-framework-css@1.1.9/css/main.css">
+    <script src="https://unpkg.com/minecraft-framework-css@1.1.9/css/assets/script.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <!-- Main Menu -->
+    <div id="menu-container">
+        <!-- Main menu screen -->
+        <div id="main-menu" class="menu-screen">
+            <div class="minecraft-logo">
+                <img src="./assets/images/Minecraftlogo.png" alt="Minecraft Logo">
+            </div>
+            <div class="menu-buttons">
+                <button id="singleplayer-btn" class="menu-button button-java-old">Singleplayer</button>
+                <button id="update-log-btn" class="menu-button button-java-old">Update Log</button>
+                <button id="information-btn" class="menu-button button-java-old">Information</button>
+                <button id="mods-btn" class="menu-button button-java-old">Mods</button>
+                <div style="display: flex; justify-content: space-between; width: 100%;">
+                    <button id="options-btn" class="menu-button button-java-old" style="width: 295px; margin-right: 5px;">Options...</button>
+                    <button id="quit-game-btn" class="menu-button button-java-old" style="width: 295px; margin-left: 5px;" onclick="window.location.href='https://websim.com'">Quit Game</button>
+                </div>
+            </div>
+            <div class="minecraft-footer">
+                <span class="minecraft-version">Minecraft WE - V0.9</span>
+                <span class="minecraft-copyright">Copyright Mojang AB. Do not distribute!</span>
+            </div>
+        </div>
+        
+        <!-- Mods Dialog -->
+        <div id="mods-dialog" class="minecraft-dialog">
+            <div class="minecraft-dialog-content">
+                <h2>Importing or creating?</h2>
+                <div class="dialog-buttons">
+                    <button id="import-mod-btn" class="menu-button button-java-old">Import</button>
+                    <button id="create-mod-btn" class="menu-button button-java-old">Create</button>
+                    <button id="close-mods-dialog-btn" class="menu-button button-java-old">Cancel</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Information Dialog -->
+        <div id="information-dialog" class="minecraft-dialog">
+            <div class="minecraft-dialog-content">
+                <h2>Information</h2>
+                <p class="information-text">Welcome to version 0.8 of Minecraft - Websim edition! This is a beta, there are many bugs and issues I have not caught yet, and for more minor ones they will likely not get fixed until a stronger model with higher tokens releases. Any how, please, enjoy!</p>
+                <div class="dialog-buttons">
+                    <button id="close-information-dialog-btn" class="menu-button button-java-old">Close</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Block Creation Dialog -->
+        <div id="block-creation-dialog" class="minecraft-dialog">
+            <div class="minecraft-dialog-content">
+                <h2>Mod Creation</h2>
+                <div class="dialog-buttons">
+                    <button id="block-creation-btn" class="menu-button button-java-old">Block Creation</button>
+                    <button id="close-block-creation-dialog-btn" class="menu-button button-java-old">Cancel</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Block Faces Dialog -->
+        <div id="block-faces-dialog" class="minecraft-dialog">
+            <div class="minecraft-dialog-content">
+                <h2>Are there unique faces to your block?</h2>
+                <div class="dialog-buttons">
+                    <button id="unique-faces-yes-btn" class="menu-button button-java-old">Yes</button>
+                    <button id="unique-faces-no-btn" class="menu-button button-java-old">No</button>
+                    <button id="close-block-faces-dialog-btn" class="menu-button button-java-old">Cancel</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Block Texture Uploader -->
+        <div id="block-texture-uploader" class="minecraft-dialog">
+            <div class="minecraft-dialog-content block-texture-content">
+                <h2>Upload Block Textures</h2>
+                <div class="block-texture-form">
+                    <div class="block-name-input">
+                        <label for="block-name">Block Name:</label>
+                        <input type="text" id="block-name" placeholder="Enter block name">
+                    </div>
+                    <div class="block-options">
+                        <label class="toggle-label">
+                            <span>Is Slab:</span>
+                            <input type="checkbox" id="is-slab-checkbox">
+                        </label>
+                        <div class="settings-hint">Half-height blocks like wooden slabs</div>
+                    </div>
+                    <div class="texture-upload-grid">
+                        <div class="texture-upload-item">
+                            <label for="texture-top">Top Face:</label>
+                            <div class="texture-preview" id="preview-top"></div>
+                            <input type="file" id="texture-top" class="texture-file" accept="image/png">
+                            <button class="upload-texture-btn" data-face="top">Upload</button>
+                        </div>
+                        <div class="texture-upload-item">
+                            <label for="texture-bottom">Bottom Face:</label>
+                            <div class="texture-preview" id="preview-bottom"></div>
+                            <input type="file" id="texture-bottom" class="texture-file" accept="image/png">
+                            <button class="upload-texture-btn" data-face="bottom">Upload</button>
+                        </div>
+                        <div class="texture-upload-item">
+                            <label for="texture-front">Front Face:</label>
+                            <div class="texture-preview" id="preview-front"></div>
+                            <input type="file" id="texture-front" class="texture-file" accept="image/png">
+                            <button class="upload-texture-btn" data-face="front">Upload</button>
+                        </div>
+                        <div class="texture-upload-item">
+                            <label for="texture-back">Back Face:</label>
+                            <div class="texture-preview" id="preview-back"></div>
+                            <input type="file" id="texture-back" class="texture-file" accept="image/png">
+                            <button class="upload-texture-btn" data-face="back">Upload</button>
+                        </div>
+                        <div class="texture-upload-item">
+                            <label for="texture-left">Left Face:</label>
+                            <div class="texture-preview" id="preview-left"></div>
+                            <input type="file" id="texture-left" class="texture-file" accept="image/png">
+                            <button class="upload-texture-btn" data-face="left">Upload</button>
+                        </div>
+                        <div class="texture-upload-item">
+                            <label for="texture-right">Right Face:</label>
+                            <div class="texture-preview" id="preview-right"></div>
+                            <input type="file" id="texture-right" class="texture-file" accept="image/png">
+                            <button class="upload-texture-btn" data-face="right">Upload</button>
+                        </div>
+                    </div>
+                    <div class="dialog-buttons texture-submit-buttons">
+                        <button id="save-block-btn" class="menu-button button-java-old">Save Block</button>
+                        <button id="cancel-texture-upload-btn" class="menu-button button-java-old">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Single Texture Uploader -->
+        <div id="single-texture-uploader" class="minecraft-dialog">
+            <div class="minecraft-dialog-content">
+                <h2>Upload Block Texture</h2>
+                <div class="block-texture-form">
+                    <div class="block-name-input">
+                        <label for="single-block-name">Block Name:</label>
+                        <input type="text" id="single-block-name" placeholder="Enter block name">
+                    </div>
+                    <div class="block-options">
+                        <label class="toggle-label">
+                            <span>Is Slab:</span>
+                            <input type="checkbox" id="single-is-slab-checkbox">
+                        </label>
+                        <div class="settings-hint">Half-height blocks like wooden slabs</div>
+                    </div>
+                    <div class="single-texture-upload">
+                        <label for="texture-single">Block Texture:</label>
+                        <div class="texture-preview" id="preview-single"></div>
+                        <input type="file" id="texture-single" class="texture-file" accept="image/png">
+                        <button class="upload-texture-btn" data-face="single">Upload</button>
+                    </div>
+                    <div class="dialog-buttons">
+                        <button id="save-single-block-btn" class="menu-button button-java-old">Save Block</button>
+                        <button id="cancel-single-texture-btn" class="menu-button button-java-old">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Crafting Recipe Creator -->
+        <div id="crafting-recipe-creator" class="minecraft-dialog">
+            <div class="minecraft-dialog-content crafting-recipe-content">
+                <h2>Create Crafting Recipe</h2>
+                <div class="crafting-recipe-form">
+                    <p class="crafting-instructions">Select blocks to create your crafting recipe</p>
+                    <div class="crafting-recipe-grid">
+                        <div class="crafting-recipe-slot" data-index="0"></div>
+                        <div class="crafting-recipe-slot" data-index="1"></div>
+                        <div class="crafting-recipe-slot" data-index="2"></div>
+                        <div class="crafting-recipe-slot" data-index="3"></div>
+                        <div class="crafting-recipe-slot" data-index="4"></div>
+                        <div class="crafting-recipe-slot" data-index="5"></div>
+                        <div class="crafting-recipe-slot" data-index="6"></div>
+                        <div class="crafting-recipe-slot" data-index="7"></div>
+                        <div class="crafting-recipe-slot" data-index="8"></div>
+                    </div>
+                    <div class="crafting-block-selector">
+                        <h3>Available Blocks</h3>
+                        <div class="block-selector-grid" id="block-selector-grid"></div>
+                    </div>
+                    <div class="dialog-buttons recipe-submit-buttons">
+                        <button id="save-recipe-btn" class="menu-button button-java-old">Save Recipe</button>
+                        <button id="skip-recipe-btn" class="menu-button button-java-old">Skip</button>
+                        <button id="cancel-recipe-btn" class="menu-button button-java-old">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mod Import Dialog -->
+        <div id="mod-import-dialog" class="minecraft-dialog">
+            <div class="minecraft-dialog-content mod-import-content">
+                <h2>Import Mods</h2>
+                <!-- Local Mods Section -->
+                <div id="local-mods-section" class="mods-section">
+                    <div id="available-mods-list" class="available-mods-list">
+                        <p class="no-mods-message">No custom blocks available yet.</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button id="share-selected-mods-btn" class="menu-button button-java-old small-button">Share Selected</button>
+                    </div>
+                </div>
+                
+                <div class="dialog-buttons">
+                    <button id="close-import-dialog-btn" class="menu-button button-java-old">Back</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Update Log Dialog -->
+        <div id="update-log-dialog" class="minecraft-dialog">
+            <div class="minecraft-dialog-content">
+                <h2>Update Log</h2>
+                <div class="information-text">
+                    <p><strong>Version 0.9:</strong></p>
+                    <ul>
+                        <li>Added day/night cycle with improved lighting</li>
+                        <li>Added farming system with wheat crops</li>
+                        <li>Added chest functionality for item storage</li>
+                        <li>Added furnace for smelting items</li>
+                        <li>Added doors that can be opened and closed</li>
+                        <li>Added cactus damage system</li>
+                        <li>Expanded crafting system with new recipes</li>
+                        <li>Improved biome generation with larger, more distinct regions</li>
+                        <li>Added slabs and various decoration blocks</li>
+                        <li>Fixed numerous bugs for improved stability</li>
+                    </ul>
+                </div>
+                <div class="dialog-buttons">
+                    <button id="close-update-log-dialog-btn" class="menu-button button-java-old">Close</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Options menu screen -->
+        <div id="options-menu" class="menu-screen">
+            <h2>Options</h2>
+            <div class="minecraft-options-grid">
+                <button id="fov-settings-btn" class="minecraft-option-button button-java-old">FOV: Normal</button>
+                <button id="sound-settings-btn" class="minecraft-option-button button-java-old">Sounds...</button>
+                <button id="video-settings-btn" class="minecraft-option-button button-java-old">Video Settings...</button>
+                <button id="controls-settings-btn" class="minecraft-option-button button-java-old">Controls...</button>
+            </div>
+            <div class="menu-buttons options-done-container">
+                <button id="save-options-btn" class="menu-button button-java-old">Done</button>
+            </div>
+        </div>
+        
+        <!-- FOV Settings submenu -->
+        <div id="fov-submenu" class="menu-screen">
+            <h2>FOV Settings</h2>
+            <div class="settings-container">
+                <div class="settings-option">
+                    <label for="fov-slider">FOV: <span id="fov-value">70</span></label>
+                    <input type="range" id="fov-slider" min="30" max="110" value="70" class="settings-slider">
+                    <div class="settings-hint">Higher values = wider field of view</div>
+                </div>
+            </div>
+            <div class="menu-buttons">
+                <button id="fov-back-btn" class="menu-button button-java-old">Done</button>
+            </div>
+        </div>
+
+        <!-- Sound Settings submenu -->
+        <div id="sound-submenu" class="menu-screen">
+            <h2>Sound Settings</h2>
+            <div class="settings-container">
+                <div class="settings-option">
+                    <label for="master-volume-slider">Master Volume: <span id="master-volume-value">100%</span></label>
+                    <input type="range" id="master-volume-slider" min="0" max="100" value="100" class="settings-slider">
+                </div>
+                <div class="settings-option">
+                    <label for="music-volume-slider">Music: <span id="music-volume-value">100%</span></label>
+                    <input type="range" id="music-volume-slider" min="0" max="100" value="100" class="settings-slider">
+                </div>
+                <div class="settings-option">
+                    <label for="sound-volume-slider">Sound: <span id="sound-volume-value">100%</span></label>
+                    <input type="range" id="sound-volume-slider" min="0" max="100" value="100" class="settings-slider">
+                </div>
+            </div>
+            <div class="menu-buttons">
+                <button id="sound-back-btn" class="menu-button button-java-old">Done</button>
+            </div>
+        </div>
+
+        <!-- Video Settings submenu -->
+        <div id="video-submenu" class="menu-screen">
+            <h2>Video Settings</h2>
+            <div class="settings-container">
+                <div class="settings-option">
+                    <label for="render-distance-menu-slider">Render Distance: <span id="render-distance-menu-value">6</span></label>
+                    <input type="range" id="render-distance-menu-slider" min="1" max="16" value="6" class="settings-slider">
+                    <div class="settings-hint">Higher values = more chunks visible, lower performance</div>
+                </div>
+                
+                <div class="settings-option">
+                    <label for="shadow-menu-toggle" class="toggle-label">
+                        Shadows: 
+                        <input type="checkbox" id="shadow-menu-toggle" checked>
+                    </label>
+                    <div class="settings-hint">Disable shadows to improve performance on slower devices</div>
+                </div>
+                
+                <div class="settings-option">
+                    <label for="fog-menu-toggle" class="toggle-label">
+                        Fog: 
+                        <input type="checkbox" id="fog-menu-toggle" checked>
+                    </label>
+                    <div class="settings-hint">Adds distance fog for a more realistic appearance</div>
+                </div>
+                
+                <div class="settings-option">
+                    <label for="chunk-update-slider">Chunk Update Rate: <span id="chunk-update-value">Medium</span></label>
+                    <input type="range" id="chunk-update-slider" min="0" max="2" value="1" class="settings-slider">
+                    <div class="settings-hint">Speed at which chunks generate (Low=1, Medium=2, High=4 chunks per frame)</div>
+                </div>
+            </div>
+            <div class="menu-buttons">
+                <button id="video-back-btn" class="menu-button button-java-old">Done</button>
+            </div>
+        </div>
+
+        <!-- Controls submenu -->
+        <div id="controls-submenu" class="menu-screen">
+            <h2>Controls</h2>
+            <div class="settings-container">
+                <div class="settings-option">
+                    <label for="sensitivity-slider">Camera Sensitivity: <span id="sensitivity-value">100%</span></label>
+                    <input type="range" id="sensitivity-slider" min="10" max="200" value="100" class="settings-slider">
+                    <div class="settings-hint">Adjust how quickly the camera moves when looking around</div>
+                </div>
+                
+                <div class="keybind-container">
+                    <div class="keybind-row">
+                        <span class="keybind-label">Move Forward:</span>
+                        <button class="keybind-button" data-action="forward">W</button>
+                    </div>
+                    <div class="keybind-row">
+                        <span class="keybind-label">Move Backward:</span>
+                        <button class="keybind-button" data-action="backward">S</button>
+                    </div>
+                    <div class="keybind-row">
+                        <span class="keybind-label">Move Left:</span>
+                        <button class="keybind-button" data-action="left">A</button>
+                    </div>
+                    <div class="keybind-row">
+                        <span class="keybind-label">Move Right:</span>
+                        <button class="keybind-button" data-action="right">D</button>
+                    </div>
+                    <div class="keybind-row">
+                        <span class="keybind-label">Jump:</span>
+                        <button class="keybind-button" data-action="jump">Space</button>
+                    </div>
+                    <div class="keybind-row">
+                        <span class="keybind-label">Sprint:</span>
+                        <button class="keybind-button" data-action="sprint">Shift</button>
+                    </div>
+                    <div class="keybind-row">
+                        <span class="keybind-label">Inventory:</span>
+                        <button class="keybind-button" data-action="inventory">E</button>
+                    </div>
+                    <div class="keybind-row">
+                        <span class="keybind-label">Drop Item:</span>
+                        <button class="keybind-button" data-action="drop">Q</button>
+                    </div>
+                </div>
+                
+                <div class="settings-option reset-options">
+                    <button id="reset-keybinds-btn" class="menu-button button-java-old secondary-button">Reset Keybinds</button>
+                </div>
+            </div>
+            <div class="menu-buttons">
+                <button id="controls-back-btn" class="menu-button button-java-old">Done</button>
+            </div>
+        </div>
+        
+        <!-- World selection screen -->
+        <div id="world-selection" class="menu-screen">
+            <h2>Select World</h2>
+            <div id="worlds-list" class="worlds-list">
+                <!-- World items will be added here dynamically -->
+            </div>
+            <div class="menu-buttons">
+                <button id="create-world-btn" class="menu-button button-java-old white-text">Create New World</button>
+                <button class="back-btn menu-button button-java-old">Back</button>
+            </div>
+        </div>
+        
+        <!-- Create world screen -->
+        <div id="create-world-screen" class="menu-screen">
+            <h2>Create New World</h2>
+            <div class="world-creation-form">
+                <div class="form-group">
+                    <label for="world-name-input">World Name:</label>
+                    <input type="text" id="world-name-input" placeholder="My World">
+                </div>
+                <div class="form-group">
+                    <label for="world-seed-input">Seed: (Optional)</label>
+                    <input type="text" id="world-seed-input" placeholder="Leave blank for random">
+                </div>
+                <div class="form-group">
+                    <div class="game-mode-options">
+                        <label for="creative-toggle" class="toggle-label">
+                            Creative Mode
+                            <input type="checkbox" id="creative-toggle">
+                        </label>
+                        <div class="settings-hint">Fly, access all blocks, no damage</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="world-type-options">
+                        <div class="superflat-controls">
+                            <label for="superflat-toggle" class="toggle-label">
+                                Superflat World
+                                <input type="checkbox" id="superflat-toggle">
+                            </label>
+                            <button id="superflat-advanced-btn" class="menu-button button-java-old small-button">Advanced settings</button>
+                        </div>
+                        <div class="settings-hint">1 grass, 2 dirt, 1 bedrock</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="game-options">
+                        <label for="show-days-toggle" class="toggle-label">
+                            Show Days Counter
+                            <input type="checkbox" id="show-days-toggle">
+                        </label>
+                        <div class="settings-hint">Display a counter showing how many days you've survived</div>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-buttons">
+                <button id="create-new-world-btn" class="menu-button button-java-old white-text">Create New World</button>
+                <button class="back-btn menu-button button-java-old">Back</button>
+            </div>
+        </div>
+        
+        <!-- Superflat Advanced Settings Dialog -->
+        <div id="superflat-advanced-dialog" class="minecraft-dialog">
+            <div class="minecraft-dialog-content">
+                <h2>Superflat Advanced Settings</h2>
+                <div class="superflat-layers-container">
+                    <div class="superflat-layer-list" id="superflat-layer-list">
+                        <!-- Layers will be generated here -->
+                    </div>
+                    <div class="superflat-layer-controls">
+                        <button id="add-layer-btn" class="menu-button button-java-old small-button">Add Layer</button>
+                        <button id="reset-layers-btn" class="menu-button button-java-old small-button">Reset to Default</button>
+                    </div>
+                </div>
+                <div class="dialog-buttons">
+                    <button id="save-superflat-settings-btn" class="menu-button button-java-old">Save</button>
+                    <button id="cancel-superflat-settings-btn" class="menu-button button-java-old">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Game Container (initially hidden) -->
+    <div id="game-container" style="display: none;">
+        <canvas id="game-canvas"></canvas>
+        <div id="crosshair">+</div>
+        <div id="hotbar"></div>
+        <div id="held-item-display"></div>
+        
+        <!-- Inventory Screen (initially hidden) -->
+        <div id="inventory-screen" class="inventory-overlay">
+            <div class="inventory-container">
+                <div class="inventory-title">Inventory</div>
+                
+                <!-- Crafting Section -->
+                <div class="crafting-section">
+                    <div class="crafting-grid">
+                        <div class="crafting-slot" data-slot="craft-0"></div>
+                        <div class="crafting-slot" data-slot="craft-1"></div>
+                        <div class="crafting-slot" data-slot="craft-2"></div>
+                        <div class="crafting-slot" data-slot="craft-3"></div>
+                    </div>
+                    <div class="crafting-arrow">→</div>
+                    <div class="crafting-result" data-slot="craft-result"></div>
+                </div>
+                
+                <!-- Main Inventory -->
+                <div class="main-inventory">
+                    <!-- Inventory rows will be added dynamically -->
+                </div>
+                
+                <!-- Hotbar (mirrored from bottom of screen) -->
+                <div class="inventory-hotbar" id="inventory-hotbar">
+                    <!-- Slots will be added dynamically -->
+                </div>
+            </div>
+            
+            <!-- Dragged item visualization -->
+            <div id="dragged-item" class="dragged-item"></div>
+        </div>
+        
+        <!-- Crafting Table Screen (initially hidden) -->
+        <div id="crafting-table-screen" class="inventory-overlay">
+            <div class="crafting-table-container">
+                <div class="inventory-title">Crafting Table</div>
+                
+                <!-- Wrap crafting elements in a horizontal row -->
+                <div class="crafting-operation-row">
+                    <!-- 3x3 Crafting Grid -->
+                    <div class="crafting-table-grid">
+                        <div class="crafting-slot" data-slot="table-craft-0"></div>
+                        <div class="crafting-slot" data-slot="table-craft-1"></div>
+                        <div class="crafting-slot" data-slot="table-craft-2"></div>
+                        <div class="crafting-slot" data-slot="table-craft-3"></div>
+                        <div class="crafting-slot" data-slot="table-craft-4"></div>
+                        <div class="crafting-slot" data-slot="table-craft-5"></div>
+                        <div class="crafting-slot" data-slot="table-craft-6"></div>
+                        <div class="crafting-slot" data-slot="table-craft-7"></div>
+                        <div class="crafting-slot" data-slot="table-craft-8"></div>
+                    </div>
+                    <div class="crafting-arrow">→</div>
+                    <div class="crafting-result" data-slot="table-craft-result"></div>
+                </div>
+                
+                <!-- Main Inventory -->
+                <div class="main-inventory" id="crafting-table-inventory">
+                    <!-- Inventory rows will be added dynamically -->
+                </div>
+                
+                <!-- Hotbar (mirrored from bottom of screen) -->
+                <div class="inventory-hotbar" id="crafting-table-hotbar">
+                    <!-- Slots will be added dynamically -->
+                </div>
+            </div>
+            
+            <!-- Dragged item visualization (shared with inventory) -->
+        </div>
+        
+        <!-- Furnace Screen (initially hidden) -->
+        <div id="furnace-screen" class="inventory-overlay">
+            <div class="furnace-container">
+                <div class="inventory-title">Furnace</div>
+                
+                <!-- Furnace Interface -->
+                <div class="furnace-grid">
+                    <!-- Input slot -->
+                    <div class="furnace-input">
+                        <div class="crafting-slot" data-slot="furnace-input"></div>
+                        <div class="furnace-label">Input</div>
+                    </div>
+                    
+                    <!-- Fuel slot -->
+                    <div class="furnace-fuel">
+                        <div class="crafting-slot" data-slot="furnace-fuel"></div>
+                        <div class="furnace-label">Fuel</div>
+                    </div>
+                    
+                    <!-- Fire icon -->
+                    <div class="furnace-fire">🔥</div>
+                    
+                    <!-- Arrow -->
+                    <div class="crafting-arrow">→</div>
+                    
+                    <!-- Output slot -->
+                    <div class="furnace-output">
+                        <div class="crafting-result" data-slot="furnace-result"></div>
+                    </div>
+                </div>
+                
+                <!-- Main Inventory -->
+                <div class="main-inventory" id="furnace-inventory">
+                    <!-- Inventory rows will be added dynamically -->
+                </div>
+                
+                <!-- Hotbar (mirrored from bottom of screen) -->
+                <div class="inventory-hotbar" id="furnace-hotbar">
+                    <!-- Slots will be added dynamically -->
+                </div>
+            </div>
+            
+            <!-- Dragged item visualization (shared with inventory) -->
+        </div>
+        
+        <!-- Chest Screen (initially hidden) -->
+        <div id="chest-screen" class="inventory-overlay">
+            <div class="chest-container">
+                <div class="inventory-title">Chest</div>
+                
+                <!-- Chest Inventory -->
+                <div class="chest-inventory" id="chest-inventory">
+                    <!-- Chest inventory slots will be added dynamically -->
+                </div>
+                
+                <!-- Divider -->
+                <div class="inventory-divider"></div>
+                
+                <!-- Player Inventory -->
+                <div class="main-inventory" id="chest-player-inventory">
+                    <!-- Player inventory slots will be added dynamically -->
+                </div>
+                
+                <!-- Player Hotbar -->
+                <div class="inventory-hotbar" id="chest-player-hotbar">
+                    <!-- Player hotbar slots will be added dynamically -->
+                </div>
+            </div>
+            
+            <!-- Dragged item visualization (shared with inventory) -->
+            <div id="chest-dragged-item" class="dragged-item"></div>
+        </div>
+        
+        <!-- Pause menu -->
+        <div id="pause-menu" class="pause-overlay">
+            <div class="pause-container">
+                <h2>Game Paused</h2>
+                <div id="storage-error-message" style="display: none; color: red; margin-bottom: 15px;"></div>
+                
+                <!-- Settings Category - Simplified to only show render distance and sensitivity -->
+                <div class="settings-category">
+                    <div class="category-title">Game Settings</div>
+                    
+                    <!-- Render distance slider -->
+                    <div class="settings-option">
+                        <label for="render-distance-slider">Render Distance: <span id="render-distance-value">6</span></label>
+                        <input type="range" id="render-distance-slider" min="1" max="16" value="6" class="settings-slider">
+                        <div class="settings-hint">Higher values = more chunks visible, lower performance</div>
+                    </div>
+                    
+                    <!-- Camera Sensitivity in pause menu -->
+                    <div class="settings-option">
+                        <label for="sensitivity-pause-slider">Camera Sensitivity: <span id="sensitivity-pause-value">100%</span></label>
+                        <input type="range" id="sensitivity-pause-slider" min="10" max="200" value="100" class="settings-slider">
+                        <div class="settings-hint">Adjust how quickly the camera moves when looking around</div>
+                    </div>
+                </div>
+                
+                <div class="menu-buttons">
+                    <button id="continue-btn" class="menu-button button-java">Continue Playing</button>
+                    <button id="save-quit-btn" class="menu-button button-java">Save and Quit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Keybind change overlay -->
+    <div id="keybind-overlay" class="keybind-overlay">
+        <div class="keybind-prompt">
+            <p>Press a key for <span id="keybind-action">action</span></p>
+            <button id="cancel-keybind-btn" class="button-java">Cancel</button>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.crafting-recipe-slot').forEach(slot => {
+                slot.addEventListener('click', function() {
+                    document.querySelectorAll('.crafting-recipe-slot').forEach(s => {
+                        s.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+            });
+        });
+
+        window.addEventListener('error', function(event) {
+            if (event.target.tagName === 'IMG' || event.target.tagName === 'IMAGE') {
+                console.error('Image failed to load:', event.target.src);
+                event.preventDefault();
+            }
+        }, true);
+
+        if (!window.websim) {
+            window.websim = {
+                upload: async function(file) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            resolve(e.target.result);
+                        };
+                        reader.onerror = function(e) {
+                            reject(new Error('Failed to read file'));
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+            };
+        }
+    </script>
+
+    <script type="module" src="./assets/js/main.js"></script>
+</body>
+</html>
